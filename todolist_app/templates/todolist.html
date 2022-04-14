@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Todo list Manager{% endblock %}
+
+{%block content %}
+<div class="container-fluid mb-3">
+
+    <h1 class="mb-4">Task list:</h1>
+
+    {% if messages %}
+    <div class="container-fluid mb-2">
+        {% for message in messages %}
+        <div class="alert alert-info alert-dismissible alert-sm fade show" role="alert">{{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container-fluid mb-3">
+        <form method="POST" class="row">
+            {% csrf_token %}
+            <label class="col-lg-4"></label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control" name="task" placeholder="Add New Task" />
+            </div>
+            <button type="submit" class="btn btn-primary col-lg-2 container-fluid">Add Task</button>
+        </form>
+    </div>
+
+    <div class="container-fluid mb-3">
+        <table class="table table-hover table-responsive text-center">
+            <thead class="table-dark">
+                <tr class="row">
+                    <th class="col-7">Task</th>
+                    <th class="col-3">Done</th>
+                    <th class="col-1">Edit</th>
+                    <th class="col-1">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if all_tasks %}
+                {% for task in all_tasks %}
+                <tr class="row">
+                    {% if task.done %}
+                    <td class="table-success col-7"><del>{{ task.task }}</del></td>
+                    <td class="col-3"><a class="text-decoration-none" href="{% url 'pending_task' task.id %}"><button type="button" class="btn btn-outline-dark">Mark This Pending</button></a></td>
+                      {% else %}
+                      <td class="col-7">{{ task.task }}</td>
+                      <td class="col-3 m-auto"><a class="text-decoration-none" href="{% url 'complete_task' task.id %}"><button type="button" class="btn btn-outline-dark">Mark This Completed</button></a></td>
+                    {% endif %}
+                    <td class="col-1"><a class="text-decoration-none" href="{% url 'edit_task' task.id %}"><button type="button" class="btn btn-outline-warning">Edit</button></a></td>
+                    <td class="col-1"><a class="text-decoration-none" href="{% url 'delete_task' task.id %}"><button type="button" class="btn btn-outline-danger">Delete</button></a></td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container-fluid">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-end">
+                <li class="page-item"><a class="page-link" href="?page=1">Previous</a></li>
+                {% if all_tasks.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ all_tasks.previous_page_number }}">{{ all_tasks.previous_page_number }}</a></li>
+                {% endif %}
+                <li class="page-item"><a class="page-link" href="?page={{ all_tasks.number }}">{{ all_tasks.number }}</a></li>
+                {% if all_tasks.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ all_tasks.next_page_number }}">{{ all_tasks.next_page_number }}</a></li>
+                {% endif %}
+                <li class="page-item"><a class="page-link" href="?page={{ all_tasks.paginator.num_pages }}">Next</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}
